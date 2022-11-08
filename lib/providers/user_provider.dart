@@ -7,8 +7,4 @@ class UserProvider with ChangeNotifier {
   User? get user {
     return SharedPrefs().userStorage.getCurrentUser();
   }
-
-  test() {
-    print("This is test update for user provider");
-  }
 }
