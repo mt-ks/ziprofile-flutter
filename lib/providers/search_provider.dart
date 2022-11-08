@@ -12,8 +12,4 @@ class SearchProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {}
   }
-
-  test() {
-    print("added new method");
-  }
 }
