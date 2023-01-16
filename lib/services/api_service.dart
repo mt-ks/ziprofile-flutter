@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import '../exceptions/api_exception.dart';
+import '../models/private_user/private_user_info_response.dart';
 import '../models/auth_response_model.dart';
 import '../storage/user_storage.dart';
 import '../utils/shared_prefs.dart';
@@ -54,8 +56,22 @@ class ApiService {
       throw e;
     }
   }
+
+  Future<PrivateUserInfoResponse> getUserInfo(dynamic user_id) async {
+    try {
+      var client = await _getClient();
+      var response = await client.post(
+        APIEndpoint.archive_user,
+        data: {'user_id': user_id},
+      );
+      return PrivateUserInfoResponse.fromJson(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
 }
 
 class APIEndpoint {
   static const authenticate = 'authentication';
+  static const archive_user = 'archive/get-user';
 }

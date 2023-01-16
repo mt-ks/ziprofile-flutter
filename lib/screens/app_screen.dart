@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziprofile/screens/app/stories_screen.dart';
 import '../screens/app/search_screen.dart';
 import '../screens/app/settings_screen.dart';
 import '../screens/app/profile_screen.dart';
@@ -32,8 +33,8 @@ class _AppScreenState extends State<AppScreen> {
       SearchScreen(
         navigatorKey: MyKeys.searchScreen,
       ),
-      Scaffold(
-        body: Center(child: Text('Stories')),
+      StoriesScreen(
+        navigatorKey: MyKeys.storiesScreen,
       ),
       SettingsScreen(),
     ];

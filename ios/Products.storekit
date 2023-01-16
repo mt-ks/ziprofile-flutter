@@ -1,0 +1,79 @@
+{
+  "identifier" : "DB8CF9B7",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "1661167544",
+    "_developerTeamID" : "65DZN63A33",
+    "_lastSynchronizedDate" : 693864768.98849106
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21103360",
+      "localizations" : [
+
+      ],
+      "name" : "zipremium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "7.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6445219424",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Sınırsız arşivlenmiş profil ve içerik gör.",
+              "displayName" : "Ziprofile Premium",
+              "locale" : "tr"
+            }
+          ],
+          "productID" : "zipremium",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Zipremium",
+          "subscriptionGroupID" : "21103360",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6445242163",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Haftalık daha fazla arşivlenmiş içerikler.",
+              "displayName" : "ZipWeekly",
+              "locale" : "tr"
+            }
+          ],
+          "productID" : "zipweek",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Zipweek",
+          "subscriptionGroupID" : "21103360",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}

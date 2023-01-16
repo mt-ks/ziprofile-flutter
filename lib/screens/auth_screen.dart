@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:ziprofile/utils/shared_prefs.dart';
+import 'package:ziprofile/widgets/scaffold_snackbar.dart';
 
 import '../screens/app_screen.dart';
 import '../services/api_service.dart';
@@ -27,6 +28,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void initState() {
+    _removeWebCookies();
     loadingDialog = LoadingDialog(context: context);
     super.initState();
   }
@@ -38,7 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void storeUserWithToken(String token) async {
-    SharedPrefs().userStorage.setBearerToken(token);
+    SharedPrefs().userStorage.setBearerToken(Uri.decodeComponent(token));
     _getAccountsEdit(token);
   }
 
@@ -56,9 +58,9 @@ class _AuthScreenState extends State<AuthScreen> {
     loadingDialog.showLoaderDialog();
     try {
       var user = await SocialService().accountsEdit();
-      _authSuccess(user.user, firstAuthToken);
-    } catch (e) {
-      _errorHandler(e);
+      _authSuccess(user.user, Uri.decodeComponent(firstAuthToken!));
+    } catch (e, stackTrace) {
+      _errorHandler(e, stackTrace);
     }
   }
 
@@ -78,8 +80,8 @@ class _AuthScreenState extends State<AuthScreen> {
       setState(() {
         _isAuthenticated = true;
       });
-    } catch (e) {
-      _errorHandler(e);
+    } catch (e, stackTrace) {
+      _errorHandler(e, stackTrace);
     }
   }
 
@@ -93,10 +95,19 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  _errorHandler(var err) {
-    print(err);
+  _errorHandler(var err, var stackTrace) async {
+    print(stackTrace);
+    SharedPrefs().userStorage.removeAll();
+    await _removeWebCookies();
+    ScaffoldSnackbar(context: context, message: "Bir hata oluştu!");
     setFlowState(false);
     loadingDialog.hideDialog();
+  }
+
+  _removeWebCookies() async {
+    final cookieManager = WebviewCookieManager();
+    await cookieManager
+        .removeCookie(SharedPrefs().cloudStorage.getConfig()!.service_address);
   }
 
   @override
@@ -123,6 +134,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   loadingDialog.showLoaderDialog();
                 },
                 onPageFinished: (url) async {
+                  print(url);
                   loadingDialog.hideDialog();
                   final cookieManager = WebviewCookieManager();
                   final gotCookies = await cookieManager.getCookies(url);
@@ -136,7 +148,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   }
                 },
                 javascriptMode: JavascriptMode.unrestricted,
-                initialUrl: "https://www.instagram.com/accounts/login",
+                initialUrl:
+                    SharedPrefs().cloudStorage.getConfig()!.service_address,
               ),
       ),
     );

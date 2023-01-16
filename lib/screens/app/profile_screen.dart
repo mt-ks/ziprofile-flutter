@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ziprofile/icons/nav_icons.dart';
 import 'package:ziprofile/providers/user_provider.dart';
+import 'package:ziprofile/screens/app/purchase_screen.dart';
+import 'package:ziprofile/utils/shared_prefs.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -12,6 +16,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log(SharedPrefs().userStorage.getBearerToken() ?? "");
     var provider = Provider.of<UserProvider>(context);
     var user = provider.user!;
     return Scaffold(
@@ -58,7 +63,9 @@ class ProfileScreen extends StatelessWidget {
                       icon: Icons.touch_app_outlined,
                       description: 'Aboneliklerim',
                       onClick: () {
-                        print("Aboneliklerim");
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => PurchaseScreen(),
+                        ));
                       }),
                   userAction(
                     icon: Icons.settings,

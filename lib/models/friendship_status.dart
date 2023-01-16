@@ -4,13 +4,13 @@ part 'friendship_status.g.dart';
 
 @JsonSerializable()
 class FriendsipStatus {
-  bool following;
-  bool is_private;
-  bool incoming_request;
-  bool outgoing_request;
-  bool is_bestie;
-  bool is_restricted;
-  bool is_feed_favorite;
+  bool? following;
+  bool? is_private;
+  bool? incoming_request;
+  bool? outgoing_request;
+  bool? is_bestie;
+  bool? is_restricted;
+  bool? is_feed_favorite;
 
   FriendsipStatus(
     this.following,

@@ -5,6 +5,7 @@ import '../models/user.dart';
 
 class UserProvider with ChangeNotifier {
   User? get user {
-    return SharedPrefs().userStorage.getCurrentUser();
+    var currentUser = SharedPrefs().userStorage.getCurrentUser();
+    return currentUser;
   }
 }

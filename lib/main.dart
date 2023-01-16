@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ziprofile/providers/search_provider.dart';
+import 'package:ziprofile/providers/story_provider.dart';
+import 'package:ziprofile/screens/auth_without_credentials.dart';
+import 'package:ziprofile/screens/signin_screen.dart';
 import './utils/shared_prefs.dart';
 
 import './providers/user_provider.dart';
@@ -28,6 +31,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => CloudConfigProvider()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx) => SearchProvider()),
+        ChangeNotifierProvider(create: (ctx) => StoryProvider()),
       ],
       child: MaterialApp(
         title: 'ZIPROFILE',
@@ -40,8 +44,11 @@ class MyApp extends StatelessWidget {
           WelcomeScreen.routeName: (ctx) => WelcomeScreen(),
           SettingScreen.routeName: (ctx) => SettingScreen(),
           AuthScreen.routeName: (ctx) => AuthScreen(),
+          SignInScreen.routeName: (ctx) => SignInScreen(),
           ConnectionFailedScreen.routeName: (ctx) => ConnectionFailedScreen(),
           AppScreen.routeName: (ctx) => AppScreen(),
+          AuthWithoutCredentialsScreen.routeName: (ctx) =>
+              AuthWithoutCredentialsScreen()
         },
       ),
     );

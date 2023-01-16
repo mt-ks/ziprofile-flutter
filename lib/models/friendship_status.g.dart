@@ -8,13 +8,13 @@ part of 'friendship_status.dart';
 
 FriendsipStatus _$FriendsipStatusFromJson(Map<String, dynamic> json) =>
     FriendsipStatus(
-      json['following'] as bool,
-      json['is_private'] as bool,
-      json['incoming_request'] as bool,
-      json['outgoing_request'] as bool,
-      json['is_bestie'] as bool,
-      json['is_feed_favorite'] as bool,
-      json['is_restricted'] as bool,
+      json['following'] as bool?,
+      json['is_private'] as bool?,
+      json['incoming_request'] as bool?,
+      json['outgoing_request'] as bool?,
+      json['is_bestie'] as bool?,
+      json['is_feed_favorite'] as bool?,
+      json['is_restricted'] as bool?,
     );
 
 Map<String, dynamic> _$FriendsipStatusToJson(FriendsipStatus instance) =>
