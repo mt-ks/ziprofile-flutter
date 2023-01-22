@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/models/private_user/private_following_user.dart';
-import 'package:ziprofile/models/user.dart';
-import 'package:ziprofile/widgets/profile_loader_widget.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
+import '../../models/private_user/private_following_user.dart';
+import '../../widgets/scaffold_snackbar.dart';
 
+// ignore: must_be_immutable
 class UserFollowingScreen extends StatefulWidget {
   final navigatorKey;
   List<PrivateFollowingUser> userList;

@@ -1,15 +1,12 @@
-import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:story_view/story_view.dart';
-import 'package:ziprofile/models/private_user/private_story.dart';
-import 'package:ziprofile/services/video_download.dart';
-import 'package:ziprofile/widgets/custom_dialog.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
+import '../../models/private_user/private_story.dart';
+import '../../services/video_download.dart';
+import '../../widgets/scaffold_snackbar.dart';
 
 class StoryScreen extends StatefulWidget {
   const StoryScreen({

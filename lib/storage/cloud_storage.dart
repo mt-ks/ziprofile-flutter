@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ziprofile/models/cloud_config.dart';
+import '../models/cloud_config.dart';
 
 class CloudStorageDB {
   final SharedPreferences prefs;

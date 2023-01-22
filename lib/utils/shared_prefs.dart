@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ziprofile/storage/cloud_storage.dart';
-import 'package:ziprofile/storage/user_storage.dart';
+import '../storage/cloud_storage.dart';
+import '../storage/oauth2_storage.dart';
+import '../storage/user_storage.dart';
 
 class SharedPrefs {
   static SharedPreferences? _sharedPrefs = null;
@@ -15,4 +16,5 @@ class SharedPrefs {
 
   UserStorageDB get userStorage => UserStorageDB(_sharedPrefs!);
   CloudStorageDB get cloudStorage => CloudStorageDB(_sharedPrefs!);
+  Oauth2StorageDB get oauth2Storage => Oauth2StorageDB(_sharedPrefs!);
 }

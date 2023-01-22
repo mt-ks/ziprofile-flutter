@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/services/social_service.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
+import '../services/social_service.dart';
+import '../utils/shared_prefs.dart';
 
 import '../models/reel.dart';
 

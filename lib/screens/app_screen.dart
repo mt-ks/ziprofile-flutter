@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/screens/app/stories_screen.dart';
+import './app/stories_screen.dart';
 import '../screens/app/search_screen.dart';
 import '../screens/app/settings_screen.dart';
 import '../screens/app/profile_screen.dart';
@@ -72,69 +72,4 @@ class MyKeys {
         storiesScreen,
         settingsScreen,
       ];
-}
-
-class MyProfile extends StatelessWidget {
-  const MyProfile({super.key, this.navigatorKey});
-  final navigatorKey;
-
-  @override
-  Widget build(BuildContext context) {
-    return Navigator(
-      key: navigatorKey,
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute(builder: ((context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('My Profilex'),
-            ),
-            body: Row(
-              children: [
-                Text('MyProfilxe'),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) => DetailsPage(
-                          naviagorKey: navigatorKey,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text('Details'),
-                ),
-              ],
-            ),
-          );
-        }));
-      },
-    );
-  }
-}
-
-class DetailsPage extends StatelessWidget {
-  const DetailsPage({super.key, this.naviagorKey});
-  final naviagorKey;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Siueee'),
-      ),
-    );
-  }
-}
-
-class MoreDetails extends StatelessWidget {
-  const MoreDetails({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Siu'),
-      ),
-    );
-  }
 }

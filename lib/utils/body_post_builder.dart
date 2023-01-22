@@ -1,9 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:developer';
 
-import 'package:ziprofile/core/constants.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
+import '../core/constants.dart';
 
 class BodyPostBuilder {
   final HashMap<String, dynamic> postList = HashMap();

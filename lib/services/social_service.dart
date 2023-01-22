@@ -1,20 +1,19 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
-import 'package:ziprofile/core/constants.dart';
-import 'package:ziprofile/exceptions/social_exception.dart';
-import 'package:ziprofile/models/current_user.dart';
-import 'package:ziprofile/models/feeds.dart';
-import 'package:ziprofile/models/reels_media_result_model.dart';
-import 'package:ziprofile/models/reels_tray.dart';
-import 'package:ziprofile/models/search_result_model.dart';
-import 'package:ziprofile/models/story_result_model.dart';
-import 'package:ziprofile/models/user_following.dart';
-import 'package:ziprofile/storage/user_storage.dart';
-import 'package:ziprofile/utils/body_post_builder.dart';
-import 'package:ziprofile/utils/user_agent_builder.dart';
+import '../core/constants.dart';
+import '../exceptions/social_exception.dart';
+import '../models/current_user.dart';
+import '../models/feeds.dart';
+import '../models/reels_media_result_model.dart';
+import '../models/reels_tray.dart';
+import '../models/search_result_model.dart';
+import '../models/story_result_model.dart';
+import '../models/user_following.dart';
+import '../storage/user_storage.dart';
+import '../utils/body_post_builder.dart';
+import '../utils/user_agent_builder.dart';
 
 class SocialService {
   Map<String, String> _defaultHeaders(String userAgent,
@@ -64,7 +63,7 @@ class SocialService {
       var response = await client
           .get(SocialEndpoint.currentUser, queryParameters: {'edit': 'true'});
       return CurrentUser.fromJson(response.data);
-    } catch (e, stackTrace) {
+    } catch (e) {
       print(e);
       throw SocialException(e);
     }

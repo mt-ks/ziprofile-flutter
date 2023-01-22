@@ -1,12 +1,8 @@
-import 'dart:developer';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ziprofile/icons/nav_icons.dart';
-import 'package:ziprofile/providers/user_provider.dart';
-import 'package:ziprofile/screens/app/purchase_screen.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
+import '../../icons/nav_icons.dart';
+import '../../providers/user_provider.dart';
+import './purchase_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
@@ -16,85 +12,78 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(SharedPrefs().userStorage.getBearerToken() ?? "");
     var provider = Provider.of<UserProvider>(context);
     var user = provider.user!;
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text("@${provider.user?.username}"),
+        title: Text("@${user.user.username}"),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(padding: EdgeInsets.only(top: 50)),
-            Row(
-              children: [
-                Spacer(),
-                userAvatar(user.profile_pic_url ?? ""),
-                Spacer(),
-              ],
-            ),
-            Padding(padding: EdgeInsets.only(top: 20)),
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  userAction(
-                    icon: NavIcons.search_icon,
-                    description: 'Arşivlenmiş Profilleri Görüntüle',
-                    onClick: () {
-                      navIndex(1);
-                    },
-                  ),
-                  userAction(
-                    icon: NavIcons.stories,
-                    description: 'Hikayeleri Gizli İzle',
-                    onClick: () {
-                      navIndex(2);
-                    },
-                  ),
-                ],
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(padding: EdgeInsets.only(top: 50)),
+              Text(
+                'Hoşgeldin!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 40,
+                  fontFamily: 'RobotoCondensed',
+                ),
               ),
-            ),
-            IntrinsicHeight(
-              child: Row(
-                children: [
-                  userAction(
-                      icon: Icons.touch_app_outlined,
-                      description: 'Aboneliklerim',
+              Padding(padding: EdgeInsets.only(top: 5)),
+              Text(
+                'Aşağıdaki menüden artık aktif şekilde gezinebilirsin!',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 20)),
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    userAction(
+                      icon: NavIcons.search_icon,
+                      description: 'Arşivlenmiş Profilleri Görüntüle',
                       onClick: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => PurchaseScreen(),
-                        ));
-                      }),
-                  userAction(
-                    icon: Icons.settings,
-                    description: 'Ayarlar',
-                    onClick: () {
-                      navIndex(3);
-                    },
-                  ),
-                ],
+                        navIndex(1);
+                      },
+                    ),
+                    userAction(
+                      icon: NavIcons.stories,
+                      description: 'Rastgele Profiller',
+                      onClick: () {
+                        navIndex(2);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  ClipRRect userAvatar(String pic) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(150),
-      child: CachedNetworkImage(
-        fit: BoxFit.cover,
-        width: 120,
-        height: 120,
-        imageUrl: pic,
-        placeholder: (context, url) => CircularProgressIndicator(),
-        errorWidget: (context, url, error) => Icon(
-          Icons.error,
-          color: Colors.white,
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    userAction(
+                        icon: Icons.touch_app_outlined,
+                        description: 'Aboneliklerim',
+                        onClick: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => PurchaseScreen(),
+                          ));
+                        }),
+                    userAction(
+                      icon: Icons.settings,
+                      description: 'Ayarlar',
+                      onClick: () {
+                        navIndex(3);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

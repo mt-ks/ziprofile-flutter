@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
-
-import '../models/user.dart';
+import '../models/oauth2_register.dart';
+import '../utils/shared_prefs.dart';
 
 class UserProvider with ChangeNotifier {
-  User? get user {
-    var currentUser = SharedPrefs().userStorage.getCurrentUser();
+  Oauth2Register? get user {
+    var currentUser = SharedPrefs().oauth2Storage.getCurrentUser();
     return currentUser;
   }
 }

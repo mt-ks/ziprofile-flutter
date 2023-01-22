@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/providers/profile_loader_provider.dart';
-import 'package:ziprofile/widgets/loading_dialog.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
+import '../providers/profile_loader_provider.dart';
+import '../widgets/loading_dialog.dart';
+import '../widgets/scaffold_snackbar.dart';
 
 import '../models/user.dart';
 import '../screens/app/user_screen.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ziprofile/models/cloud_config.dart';
+import '../models/cloud_config.dart';
 import 'package:http/http.dart' as http;
 
 class CloudService {

@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ziprofile/models/reel.dart';
-import 'package:ziprofile/providers/story_provider.dart';
-import 'package:ziprofile/screens/app/story_screen.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
-
-import '../../models/private_user/private_story.dart';
+import '../../providers/random_users_provider.dart';
+import './user_screen.dart';
+import '../../exceptions/api_exception.dart';
+import '../../models/private_user/private_user.dart';
+import '../../services/api_service.dart';
 import '../../widgets/cached_image.dart';
+import '../../widgets/loading_dialog.dart';
+import '../../widgets/scaffold_snackbar.dart';
 
-class StoriesScreen extends StatelessWidget {
+class StoriesScreen extends StatefulWidget {
   const StoriesScreen({super.key, required this.navigatorKey});
   final navigatorKey;
+
+  @override
+  State<StoriesScreen> createState() => _StoriesScreenState();
+}
+
+class _StoriesScreenState extends State<StoriesScreen> {
+  late LoadingDialog _loadingDialog;
+
   @override
   Widget build(BuildContext context) {
     //return _page();
     return Navigator(
-      key: navigatorKey,
+      key: widget.navigatorKey,
       onGenerateRoute: (settings) {
         return MaterialPageRoute(builder: (context) {
           return _page(context);
@@ -25,21 +34,20 @@ class StoriesScreen extends StatelessWidget {
   }
 
   _page(BuildContext context) {
-    var provider = Provider.of<StoryProvider>(context, listen: true);
+    var provider = Provider.of<RandomUsersProvider>(context, listen: true);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text('Hikayeler'),
+        title: Text('Rastgele Profiller'),
       ),
       body: _pageContent(provider),
     );
   }
 
-  _pageContent(StoryProvider provider) {
-    return ((provider.stored_reels == null ||
-                provider.stored_reels?.length == 0) &&
-            !SharedPrefs().userStorage.getIsFastAuth())
+  _pageContent(RandomUsersProvider provider) {
+    return ((provider.randomUsers == null ||
+            provider.randomUsers?.users.length == 0))
         ? _buildEmptyPage()
         : _buildGridView(provider);
   }
@@ -52,7 +60,7 @@ class StoriesScreen extends StatelessWidget {
         Container(
           width: double.infinity,
           child: Text(
-            'Hiç Hikaye Listelenemedi!',
+            'Hiç Profil Listelenemedi!',
             style: TextStyle(
               color: Colors.white,
               fontSize: 19,
@@ -65,12 +73,8 @@ class StoriesScreen extends StatelessWidget {
     );
   }
 
-  CustomScrollView _buildGridView(StoryProvider provider) {
-    var childCount = provider.stored_reels?.length ?? 0;
-    if (SharedPrefs().userStorage.getIsFastAuth()) {
-      childCount =
-          SharedPrefs().userStorage.getM2XUserList()?.userResponses.length ?? 0;
-    }
+  CustomScrollView _buildGridView(RandomUsersProvider provider) {
+    var childCount = provider.randomUsers?.users.length ?? 0;
     return CustomScrollView(
       slivers: [
         SliverList(
@@ -82,7 +86,7 @@ class StoriesScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'Takip ettiğiniz kullanıcıların hikayelerini görmek için oturum açmalısınız.',
+                  'Aşağıdaki profiller rastgele listelenmiştir, hemen görüntüleyebilirsiniz.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black),
                 ),
@@ -94,26 +98,32 @@ class StoriesScreen extends StatelessWidget {
             delegate: SliverChildBuilderDelegate((context, index) {
               return Card(
                 color: Colors.grey[850],
-                child: SharedPrefs().userStorage.getIsFastAuth() == true
-                    ? _nonAuthListView(index)
-                    : storyWidget(provider, index, context),
+                child: storyWidget(
+                  provider.randomUsers!.users[index],
+                  provider.randomUsers?.access_token,
+                  context,
+                ),
               );
             }, childCount: childCount),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 1,
               crossAxisSpacing: 1,
-              childAspectRatio: 0.75,
+              childAspectRatio: 0.70,
             ))
       ],
     );
   }
 
-  Widget _nonAuthListView(int index) {
-    var user =
-        SharedPrefs().userStorage.getM2XUserList()!.userResponses[index].info;
+  InkWell storyWidget(
+    PrivateUser user,
+    String? access_token,
+    BuildContext context,
+  ) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        _loadUser(user, access_token, context);
+      },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -121,80 +131,58 @@ class StoriesScreen extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(250),
             child: CachedImage(
-              imageUrl: user?.profile_picture ?? "",
+              imageUrl: user.profile_picture,
               width: 90,
               height: 90,
             ),
           ),
           Padding(padding: EdgeInsets.only(top: 5)),
-          Text(
-            user?.username ?? "",
-            style: TextStyle(color: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-
-  InkWell storyWidget(StoryProvider provider, int index, BuildContext context) {
-    return InkWell(
-      onTap: () => _openStory(provider.stored_reels![index], context),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(250),
-            child: CachedImage(
-              imageUrl: provider.stored_reels?[index].user.profile_pic_url,
-              width: 90,
-              height: 90,
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              '${user.username}',
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
             ),
           ),
-          Padding(padding: EdgeInsets.only(top: 5)),
-          Text(
-            provider.stored_reels?[index].user.username ?? "",
-            style: TextStyle(color: Colors.white),
-          ),
+          (user.is_private == true)
+              ? Container(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(
+                    Icons.lock,
+                    color: Colors.grey,
+                    size: 16,
+                  ),
+                )
+              : Container()
         ],
       ),
     );
   }
 
-  _openStory(Reel reel, BuildContext ctx) {
-    List<PrivateStory> _privateStories = [];
+  void _loadUser(
+      PrivateUser user, String? accessToken, BuildContext ctx) async {
+    _loadingDialog = LoadingDialog(context: context);
+    try {
+      _loadingDialog.showLoaderDialog();
+      var result = await ApiService().getUserInfo(
+        user.pk,
+        access_token: accessToken,
+      );
+      _loadingDialog.hideDialog();
 
-    for (var item in reel.items) {
-      var media_type = item.media_type;
-      if (media_type == 1) {
-        _privateStories.add(
-          PrivateStory(
-            item.taken_at,
-            item.id,
-            media_type,
-            item.image_versions2?.candidates?[0].url,
-            null,
+      Navigator.of(ctx).push(
+        MaterialPageRoute(
+          builder: (ctx) => UserScreen(
+            naviagorKey: widget.navigatorKey,
+            response: result,
           ),
-        );
-      } else {
-        _privateStories.add(
-          PrivateStory(
-            item.taken_at,
-            item.id,
-            media_type,
-            null,
-            item.video_versions?[0].url,
-          ),
-        );
-      }
-    }
-    Navigator.of(ctx).push(
-      MaterialPageRoute(
-        builder: (context) => StoryScreen(
-          privateStory: _privateStories,
         ),
-      ),
-    );
+      );
+    } on APIException catch (e) {
+      _loadingDialog.hideDialog();
+      ScaffoldSnackbar(context: context, message: e.message);
+    }
   }
 
   Widget StoryListItem() {

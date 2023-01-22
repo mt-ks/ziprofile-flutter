@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:ziprofile/screens/welcome_screen.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
+import '../welcome_screen.dart';
+import '../../utils/shared_prefs.dart';
 
-class SettingsScreen extends StatelessWidget {
+import 'purchase_screen.dart';
+
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  _navigateToPurchaseScreen(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => PurchaseScreen(),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,16 +29,9 @@ class SettingsScreen extends StatelessWidget {
         children: [
           SettingsItem(
             icon: Icons.upgrade,
-            title: 'Premium Ol',
+            title: 'Aboneliklerim',
             onClick: () {
-              print("prem");
-            },
-          ),
-          SettingsItem(
-            icon: Icons.refresh,
-            title: 'Aboneliklerimi Geri Yükle',
-            onClick: () {
-              print("abonel");
+              _navigateToPurchaseScreen(context);
             },
           ),
           SettingsItem(
@@ -33,6 +39,7 @@ class SettingsScreen extends StatelessWidget {
             title: 'Çıkış Yap',
             onClick: () async {
               SharedPrefs().userStorage.removeAll();
+              SharedPrefs().oauth2Storage.removeAll();
               Navigator.of(context).pushNamedAndRemoveUntil(
                 WelcomeScreen.routeName,
                 ((route) => false),

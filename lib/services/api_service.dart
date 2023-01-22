@@ -1,10 +1,10 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
+import '../models/generic_response.dart';
+import '../models/oauth2_register.dart';
+import '../models/search_users_response.dart';
+import '../models/user_subscriptions_response.dart';
 import '../exceptions/api_exception.dart';
 import '../models/private_user/private_user_info_response.dart';
-import '../models/auth_response_model.dart';
-import '../storage/user_storage.dart';
 import '../utils/shared_prefs.dart';
 
 class ApiService {
@@ -18,60 +18,152 @@ class ApiService {
 
   Future<Dio> _getClient() async {
     var cloudStorage = SharedPrefs().cloudStorage;
-    var userStorage = await UserStorage().connect();
+    var oaut2hStorage = SharedPrefs().oauth2Storage;
     var dio = Dio();
     dio.options.baseUrl = cloudStorage.getConfig()!.service_provider + 'api/';
-    dio.options.headers = _defaultHeaders(userStorage.getOauthToken());
+    dio.options.headers = _defaultHeaders(oaut2hStorage.getOauthToken());
     return dio;
   }
 
-  Future<AuthResponseModel> authenticate(
-    String? username,
-    dynamic userId,
-    String? token,
-    int? gender, {
-    String? csrftoken = null,
-    String? useragent = null,
-    String? with_bearer = null,
-  }) async {
-    var client = await _getClient();
-    var postData = {
-      'username': username,
-      'user_id': userId,
-      'token': base64.encode(utf8.encode(token!)),
-      'gender': gender,
-      'csrf_token': csrftoken,
-      'useragent': useragent,
-      'with_bearer': with_bearer
-    };
+  Future<Oauth2Register> login(String email, String password) async {
     try {
-      print(client.options.baseUrl);
-      var response =
-          await client.post(APIEndpoint.authenticate, data: postData);
-      return AuthResponseModel.fromJson(response.data);
+      var client = await _getClient();
+      var response = await client.post(APIEndpoint.login, data: {
+        'email': email,
+        'password': password,
+      });
+      return Oauth2Register.fromJson(response.data);
     } catch (e) {
-      if (e is DioError) {
-        print(e.response?.data);
-      }
-      throw e;
+      throw APIException(e);
     }
   }
 
-  Future<PrivateUserInfoResponse> getUserInfo(dynamic user_id) async {
+  Future<Oauth2Register> register(
+    String email,
+    String username,
+    String password,
+    String rePassword,
+    int gender,
+  ) async {
+    try {
+      var client = await _getClient();
+      var response = await client.post(APIEndpoint.register, data: {
+        'email': email,
+        'username': username,
+        'password': password,
+        're_password': rePassword,
+        'gender': gender,
+      });
+      return Oauth2Register.fromJson(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
+
+  Future<SearchUsersResponse> searchUsers(String username) async {
+    try {
+      var client = await _getClient();
+      var response = await client
+          .post(APIEndpoint.searchUser, data: {'username': username});
+      return SearchUsersResponse.fromJson(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
+
+  Future<SearchUsersResponse> randomUsers() async {
+    try {
+      var client = await _getClient();
+      var response = await client.get(APIEndpoint.randomUsers);
+      return SearchUsersResponse.fromJson(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
+
+  Future<PrivateUserInfoResponse> getUserInfo(
+    dynamic user_id, {
+    String? access_token = null,
+  }) async {
     try {
       var client = await _getClient();
       var response = await client.post(
-        APIEndpoint.archive_user,
-        data: {'user_id': user_id},
+        APIEndpoint.userInfo,
+        data: {
+          'user_id': user_id,
+          'access_token': access_token,
+        },
       );
       return PrivateUserInfoResponse.fromJson(response.data);
     } catch (e) {
       throw APIException(e);
     }
   }
+
+  Future<void> restorePurchases(String receiptData) async {
+    try {
+      var client = await _getClient();
+      var response = await client.post(APIEndpoint.restorePurchase, data: {
+        'receipt-data': receiptData,
+      });
+      print(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
+
+  Future<UserSubscriptionsResponse> getActiveSubscriptions() async {
+    try {
+      var client = await _getClient();
+      var response = await client.get(APIEndpoint.activePurchases);
+      print(response.data);
+      return UserSubscriptionsResponse.fromJson(response.data);
+    } catch (e) {
+      print(e);
+      throw APIException(e);
+    }
+  }
+
+  Future<GenericResponse> sendResetPasswordCode(String email) async {
+    try {
+      var client = await _getClient();
+      var response =
+          await client.post(APIEndpoint.sendResetPasswordCode, data: {
+        'email': email,
+      });
+      return GenericResponse.fromJson(response.data);
+    } catch (e) {
+      throw APIException(e);
+    }
+  }
+
+  Future<Oauth2Register> confirmResetPassword(String email, String password,
+      String rePassword, String verificationCode) async {
+    try {
+      var client = await _getClient();
+      var response =
+          await client.post(APIEndpoint.confirmResetPasswordCode, data: {
+        'email': email,
+        'password': password,
+        're_password': rePassword,
+        'verification_code': verificationCode
+      });
+      return Oauth2Register.fromJson(response.data);
+    } catch (e) {
+      print(e);
+      throw APIException(e);
+    }
+  }
 }
 
 class APIEndpoint {
-  static const authenticate = 'authentication';
-  static const archive_user = 'archive/get-user';
+  static const login = 'oauth2/login';
+  static const register = 'oauth2/register';
+  static const sendResetPasswordCode = 'oauth2/reset-password';
+  static const confirmResetPasswordCode = 'oauth2/reset-password-confirm';
+  static const searchUser = 'search-users';
+  static const userInfo = 'search-users/detail';
+  static const randomUsers = 'search-users/random';
+  static const restorePurchase = 'apple-restore';
+  static const activePurchases = 'iap/active-subscriptions';
 }

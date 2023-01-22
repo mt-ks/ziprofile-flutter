@@ -1,14 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:ziprofile/models/private_user/private_user_info_response.dart';
-import 'package:ziprofile/screens/app/post_screen.dart';
-import 'package:ziprofile/screens/app/story_screen.dart';
-import 'package:ziprofile/screens/app/user_following_screen.dart';
-import 'package:ziprofile/widgets/cached_image.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
-import 'package:story_view/story_view.dart';
+import '../../models/private_user/private_user_info_response.dart';
+import './post_screen.dart';
+import './story_screen.dart';
+import './user_following_screen.dart';
+import '../../widgets/cached_image.dart';
+import '../../widgets/scaffold_snackbar.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key, this.naviagorKey, required this.response});
@@ -134,6 +131,7 @@ class _UserScreenState extends State<UserScreen> {
             if (index == 0) {
               return UserHead();
             }
+            return Container();
           }),
           itemCount: 2),
     );

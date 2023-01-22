@@ -18,10 +18,9 @@ class SplashScreen extends StatelessWidget {
 
   void storeConfigAndNavigate(BuildContext ctx, CloudConfig data) {
     SharedPrefs().cloudStorage.setConfig(data);
-    String? token = SharedPrefs().userStorage.getBearerToken();
-    String? oauth_token = SharedPrefs().userStorage.getOauthToken();
+    String? oauth_token = SharedPrefs().oauth2Storage.getOauthToken();
     Future.delayed(Duration.zero, () {
-      if (token == null || token == '' || oauth_token == '') {
+      if (oauth_token == '') {
         Navigator.of(ctx).pushNamedAndRemoveUntil(
           WelcomeScreen.routeName,
           (r) => false,

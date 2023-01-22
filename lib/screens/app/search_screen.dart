@@ -1,20 +1,19 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ziprofile/exceptions/social_exception.dart';
-import 'package:ziprofile/providers/profile_loader_provider.dart';
-import 'package:ziprofile/screens/app/user_screen.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
-import 'package:ziprofile/widgets/custom_dialog.dart';
-import 'package:ziprofile/widgets/loading_dialog.dart';
-import '../../models/user.dart';
+import '../../exceptions/api_exception.dart';
+import '../../models/private_user/private_user.dart';
+import './user_screen.dart';
+import '../../services/api_service.dart';
+import '../../utils/shared_prefs.dart';
+import '../../widgets/custom_dialog.dart';
+import '../../widgets/loading_dialog.dart';
 import '../../providers/search_provider.dart';
 import '../../widgets/cached_image.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../widgets/scaffold_snackbar.dart';
 
 import '../welcome_screen.dart';
+import 'purchase_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key, this.navigatorKey});
@@ -59,13 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _searchRouter() {
-    if (SharedPrefs().userStorage.getIsFastAuth() == false) {
-      _search();
-    } else {
-      ScaffoldSnackbar(
-          context: context,
-          message: "Arama yapmak için oturum açmanız gerekiyor!");
-    }
+    _search();
   }
 
   void _search() async {
@@ -80,10 +73,13 @@ class _SearchScreenState extends State<SearchScreen> {
     try {
       _loadingDialog.showLoaderDialog();
       await provider.searchUsers(searchInputController.text);
+      if (provider.searchResponse?.users.length == 0) {
+        ScaffoldSnackbar(context: context, message: 'Kullanıcıyı bulunamadı!');
+      }
       _loadingDialog.hideDialog();
-    } catch (e, stackTrace) {
+    } catch (e) {
       _loadingDialog.hideDialog();
-      if (e is SocialException) {
+      if (e is APIException) {
         if (e.loginRequired) {
           _loginRequiredDialog();
         }
@@ -96,55 +92,59 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  void _loadUser(User user, BuildContext ctx) {
-    _loadingDialog.showLoaderDialog();
-    ProfileLoaderProvider(
-      user: user,
-      onLoadSuccess: (value) {
-        _loadingDialog.hideDialog();
-        Navigator.of(ctx).push(
-          MaterialPageRoute(
-            builder: (ctx) => UserScreen(
-              naviagorKey: navigatorKey,
-              response: value,
-            ),
+  void _loadUser(PrivateUser user, BuildContext ctx) async {
+    _loadingDialog = LoadingDialog(context: context);
+    try {
+      _loadingDialog.showLoaderDialog();
+      var result = await ApiService().getUserInfo(user.pk);
+      _loadingDialog.hideDialog();
+
+      Navigator.of(ctx).push(
+        MaterialPageRoute(
+          builder: (ctx) => UserScreen(
+            naviagorKey: navigatorKey,
+            response: result,
           ),
-        );
-      },
-      onLoadFailed: (value) {
-        _loadingDialog.hideDialog();
-        ScaffoldSnackbar(
-          context: context,
-          message: value,
-        );
-      },
-      onLoginRequired: () {
-        _loadingDialog.hideDialog();
-        _loginRequiredDialog();
-      },
-      onOpenNeedSubscription: () {
-        _loadingDialog.hideDialog();
+        ),
+      );
+    } on APIException catch (e) {
+      _loadingDialog.hideDialog();
+      if (e.errorType == 'need_subscription') {
         showDialog(
-          context: context,
-          builder: ((_) {
-            return CustomDialog(
-              title: "Abonelik Gerekli",
-              description:
-                  "Bu hizmeti alabilmek için ücretli abonelik satın almanız gerekmektedir.",
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context, 'OK');
-                  },
-                  child: Text('Abonelik Satın Al'),
-                ),
-              ],
-            );
-          }),
-        );
-      },
-    );
+            context: context,
+            builder: ((context) {
+              return CustomDialog(
+                title: e.errorTitle,
+                description: e.errorDescription,
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Geri'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => PurchaseScreen(),
+                          ));
+                        },
+                        child: Text('Abonelik Satın Al'),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            }));
+      }
+      ScaffoldSnackbar(context: context, message: e.message);
+    }
   }
+
+  //_navigateTo
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +163,6 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Scaffold pageContent(BuildContext ctx) {
-    print("auth state");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -174,26 +173,12 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          SharedPrefs().userStorage.getIsFastAuth()
-              ? Container(
-                  margin: EdgeInsets.only(bottom: 15),
-                  color: Colors.yellow[800],
-                  width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Arama yapmak için oturum açmalısınız! Aşağıda rastgele gizli profiller listelenir.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                )
-              : Container(),
           Row(
             children: [
               Expanded(
                 child: CustomTextField(
                   controller: searchInputController,
+                  hintText: 'Kullanıcı adı',
                 ),
               ),
               Container(
@@ -213,9 +198,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ],
           ),
           Expanded(
-            child: SharedPrefs().userStorage.getIsFastAuth()
-                ? _nonAuthListView()
-                : searchListView(ctx),
+            child: searchListView(ctx),
           ),
         ],
       ),
@@ -225,7 +208,7 @@ class _SearchScreenState extends State<SearchScreen> {
   ListView searchListView(BuildContext ctx) {
     return ListView.builder(
       itemBuilder: ((context, index) {
-        var user = provider.searchResult!.users[index];
+        var user = provider.searchResponse!.users[index];
         return InkWell(
           onTap: () => _loadUser(user, ctx),
           child: ListTile(
@@ -251,71 +234,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   : Container(),
             ]),
             subtitle: Text(
-              provider.searchResult?.users[index].full_name ?? "...",
+              provider.searchResponse?.users[index].full_name ?? "...",
               style: TextStyle(color: Colors.white),
             ),
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(150),
               child: CachedImage(
                   imageUrl:
-                      provider.searchResult?.users[index].profile_pic_url),
+                      provider.searchResponse?.users[index].profile_picture),
             ),
           ),
         );
       }),
-      itemCount: provider.searchResult?.users.length ?? 0,
-    );
-  }
-
-  _nonAuthListView() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        var user = provider.m2xResponse!.userResponses[index].info;
-        return InkWell(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (ctx) => UserScreen(
-                  naviagorKey: navigatorKey,
-                  response: provider.m2xResponse!.userResponses[index],
-                ),
-              ),
-            );
-          },
-          child: ListTile(
-            title: Row(children: [
-              Text(
-                user?.username ?? "...",
-                style: TextStyle(color: Colors.white),
-              ),
-              Padding(padding: EdgeInsets.only(left: 7)),
-              (user?.is_verified == true)
-                  ? Icon(
-                      Icons.verified,
-                      color: Colors.blue,
-                      size: 16,
-                    )
-                  : Container(),
-              (user?.is_private == true)
-                  ? Icon(
-                      Icons.lock,
-                      color: Colors.grey,
-                      size: 16,
-                    )
-                  : Container(),
-            ]),
-            subtitle: Text(
-              user?.full_name ?? "...",
-              style: TextStyle(color: Colors.white),
-            ),
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(150),
-              child: CachedImage(imageUrl: user?.profile_picture),
-            ),
-          ),
-        );
-      },
-      itemCount: provider.m2xResponse?.userResponses.length ?? 0,
+      itemCount: provider.searchResponse?.users.length ?? 0,
     );
   }
 

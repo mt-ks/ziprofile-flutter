@@ -1,14 +1,10 @@
-import 'dart:developer';
-import 'dart:ffi';
 import 'dart:typed_data';
-
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:ziprofile/widgets/cached_image.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
+import '../../widgets/cached_image.dart';
+import '../../widgets/scaffold_snackbar.dart';
 import '../../models/private_user/private_post.dart';
 import 'package:intl/intl.dart';
 
@@ -80,22 +76,6 @@ class _PostScreenState extends State<PostScreen> {
         ),
       ),
     );
-    // return Navigator(
-    //   key: navigatorKey,
-    //   onGenerateRoute: (settings) {
-    //     return MaterialPageRoute(builder: ((ctx) {
-    //       return Scaffold(
-    //         appBar: AppBar(),
-    //         body: Center(
-    //           child: Text(
-    //             'Post Screen',
-    //             style: TextStyle(color: Colors.white),
-    //           ),
-    //         ),
-    //       );
-    //     }));
-    //   },
-    // );
   }
 
   _save() async {
@@ -110,7 +90,7 @@ class _PostScreenState extends State<PostScreen> {
       url,
       options: Options(responseType: ResponseType.bytes),
     );
-    final result = await ImageGallerySaver.saveImage(
+    await ImageGallerySaver.saveImage(
       Uint8List.fromList(response.data),
       quality: 60,
       name: privatePost.code,

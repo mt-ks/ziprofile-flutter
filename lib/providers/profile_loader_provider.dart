@@ -1,16 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:ziprofile/exceptions/api_exception.dart';
-import 'package:ziprofile/exceptions/social_exception.dart';
-import 'package:ziprofile/models/private_user/private_carousel.dart';
-import 'package:ziprofile/models/private_user/private_following_user.dart';
-import 'package:ziprofile/models/private_user/private_post.dart';
-import 'package:ziprofile/models/private_user/private_user.dart';
-import 'package:ziprofile/models/private_user/private_user_info_response.dart';
-import 'package:ziprofile/models/user.dart';
-import 'package:ziprofile/services/api_service.dart';
-import 'package:ziprofile/services/social_service.dart';
+import '../exceptions/api_exception.dart';
+import '../exceptions/social_exception.dart';
+import '../models/private_user/private_carousel.dart';
+import '../models/private_user/private_following_user.dart';
+import '../models/private_user/private_post.dart';
+import '../models/private_user/private_user.dart';
+import '../models/private_user/private_user_info_response.dart';
+import '../models/user.dart';
+import '../services/api_service.dart';
+import '../services/social_service.dart';
 
 import '../models/private_user/private_story.dart';
 

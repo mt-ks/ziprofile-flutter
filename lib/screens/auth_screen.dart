@@ -4,14 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:ziprofile/utils/shared_prefs.dart';
-import 'package:ziprofile/widgets/scaffold_snackbar.dart';
+import '../utils/shared_prefs.dart';
+import '../widgets/scaffold_snackbar.dart';
 
 import '../screens/app_screen.dart';
-import '../services/api_service.dart';
 import '../widgets/loading_dialog.dart';
-import '../models/user.dart';
-import '../services/social_service.dart';
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth';
@@ -57,33 +54,33 @@ class _AuthScreenState extends State<AuthScreen> {
     setFlowState(true);
     loadingDialog.showLoaderDialog();
     try {
-      var user = await SocialService().accountsEdit();
-      _authSuccess(user.user, Uri.decodeComponent(firstAuthToken!));
+      //var user = await SocialService().accountsEdit();
+      //_authSuccess(user.user, Uri.decodeComponent(firstAuthToken!));
     } catch (e, stackTrace) {
       _errorHandler(e, stackTrace);
     }
   }
 
-  _authSuccess(User user, String? firstAuthToken) async {
-    try {
-      var authenticate = await ApiService().authenticate(
-        user.username,
-        user.pk,
-        firstAuthToken,
-        user.gender,
-        with_bearer: SharedPrefs().userStorage.getBearerToken(),
-      );
-      // Store oauth token
-      SharedPrefs().userStorage.setOauthToken(authenticate.oauth_token);
-      SharedPrefs().userStorage.setCurrentUser(user);
-      loadingDialog.hideDialog();
-      setState(() {
-        _isAuthenticated = true;
-      });
-    } catch (e, stackTrace) {
-      _errorHandler(e, stackTrace);
-    }
-  }
+  // _authSuccess(User user, String? firstAuthToken) async {
+  //   try {
+  //     var authenticate = await ApiService().authenticate(
+  //       user.username,
+  //       user.pk,
+  //       firstAuthToken,
+  //       user.gender,
+  //       with_bearer: SharedPrefs().userStorage.getBearerToken(),
+  //     );
+  //     // Store oauth token
+  //     SharedPrefs().userStorage.setOauthToken(authenticate.oauth_token);
+  //     SharedPrefs().userStorage.setCurrentUser(user);
+  //     loadingDialog.hideDialog();
+  //     setState(() {
+  //       _isAuthenticated = true;
+  //     });
+  //   } catch (e, stackTrace) {
+  //     _errorHandler(e, stackTrace);
+  //   }
+  // }
 
   _navigateListener() {
     if (_isAuthenticated) {

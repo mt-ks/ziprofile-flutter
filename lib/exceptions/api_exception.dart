@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
 class APIException implements Exception {
-  String message = "Beklenmedi bir hata oluştu!";
+  String message = "Beklenmedik bir hata oluştu!";
   bool loginRequired = false;
   dynamic responseData = null;
   dynamic errorType = null;
@@ -27,7 +27,7 @@ class APIException implements Exception {
 
     if (responseMessage == "bad_auth") {
       loginRequired = true;
-      this.message == "Oturumunuz sona erdi";
+      this.message = "Oturumunuz sona erdi, tekrar giriş yapın.";
       return;
     }
 

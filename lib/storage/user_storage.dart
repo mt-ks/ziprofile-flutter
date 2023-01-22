@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ziprofile/models/m2x_response.dart';
 
 import '../models/user.dart';
 
@@ -50,18 +49,6 @@ class UserStorageDB {
       return null;
     }
     return User.fromJson(jsonDecode(info));
-  }
-
-  void setM2XUserList(M2XResponse response) {
-    prefs.setString("m2x_user_list", jsonEncode(response.toJson()));
-  }
-
-  M2XResponse? getM2XUserList() {
-    final response = prefs.getString("m2x_user_list");
-    if (response == null) {
-      return null;
-    }
-    return M2XResponse.fromJson(jsonDecode(response));
   }
 
   void setIsFastAuth(bool isFastAuth) {
